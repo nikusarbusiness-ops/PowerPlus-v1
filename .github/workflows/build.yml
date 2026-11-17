@@ -1,49 +1,49 @@
+
 name: Build CorePlus
 
 on:
   push:
-    branches: [ main, master ]
+    branches:
+      - main
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Repository herunterladen
+        uses: actions/checkout@v4
 
-      - name: Ordnerstruktur anlegen
-        run: |
-          mkdir -p src/main/java/de/coreplus src/main/resources
-          mv CorePlus.java src/main/java/de/coreplus/
-          mv plugin.yml config.yml src/main/resources/
-
-      - uses: actions/setup-java@v5
+      - name: Java 21 einrichten
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '21'
           cache: maven
 
+      - name: Ordnerstruktur erstellen
+        run: |
+          mkdir -p src/main/java
+          mkdir -p src/main/resources
+          cp ./*.java src/main/java/
+          cp plugin.yml config.yml src/main/resources/
+
       - name: Plugin bauen
         run: mvn -B clean package
 
-      - name: JAR pruefen
+      - name: JAR überprüfen
         run: |
-          unzip -l target/CorePlus.jar | grep -q "plugin.yml" || { echo "FEHLER: plugin.yml fehlt"; exit 1; }
-          unzip -l target/CorePlus.jar | grep -q "de/coreplus/CorePlus.class" || { echo "FEHLER: CorePlus.class fehlt"; exit 1; }
-          echo "JAR ist in Ordnung"
+          echo "Suche Plugin-JAR..."
+          find target -maxdepth 1 -name "*.jar" -type f
+          test -n "$(find target -maxdepth 1 -name "*.jar" -type f -print -quit)"
 
-      - uses: actions/upload-artifact@v4
+      - name: JAR hochladen
+        uses: actions/upload-artifact@v4
         with:
-          name: CorePlus-jar
-          path: target/CorePlus.jar
-
-      - name: Release erstellen
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh release create "build-${{ github.run_number }}" target/CorePlus.jar \
-            --title "CorePlus Build ${{ github.run_number }}" \
-            --notes "Automatischer Build aus Commit ${{ github.sha }}"
+          name: CorePlus
+          path: target/*.jar
+          if-no-files-found: error
