@@ -1,0 +1,28 @@
+# Teleport-Verzoegerung in Sekunden (0 = sofort). Bewegen bricht ab.
+teleport-delay: 3
+tpa-timeout-seconds: 60
+
+homes:
+  # Gratis-Rang / Standard
+  default: 3
+  # LuckPerms-Gruppen -> Anzahl Homes (hoechster Wert gewinnt).
+  # Der Gruppenname muss exakt dem LuckPerms-Gruppennamen entsprechen.
+  ranks:
+    vip: 6
+    mvp: 10
+    admin: 50
+  # Weitere Moeglichkeiten per LuckPerms:
+  #  Permission:  /lp group vip permission set power.homes.15 true
+  #  Meta:        /lp group vip meta set power.homes 15
+  #  Unbegrenzt:  /lp group admin permission set power.homes.unlimited true
+
+rtp:
+  world: world
+  radius: 100000
+  nether-world: world_nether
+  end-world: world_the_end
+  nether-radius: 10000
+  end-radius: 1000
+  # Gesperrte Welten im GUI (nutzbar mit Permission power.rtp.nether / power.rtp.end)
+  nether-locked: true
+  end-locked: true
